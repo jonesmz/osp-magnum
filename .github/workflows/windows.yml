@@ -17,6 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         vcpkg install sdl2:x64-windows
+        echo "Start cmake toolchain file"
         cat C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 
     - name: Build OSP-Magnum
