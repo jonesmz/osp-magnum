@@ -29,12 +29,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tool: [clang-analyzer, iwyu, CodeQL]
+        tool: [gcc-analyzer, clang-analyzer, iwyu, CodeQL]
         config: [Release, Debug]
 
     permissions:
       # required for all codeql to report detected outcomes
       security-events: write
+
+    env:
+      CFLAGS:   ${{ matrix.tool == 'gcc-analyzer' && '-fanalyzer' || '' }}
+      CXXFLAGS: ${{ matrix.tool == 'gcc-analyzer' && '-fanalyzer' || '' }}
 
     steps:
     - uses: actions/checkout@v3
@@ -65,6 +69,13 @@ jobs:
     - name: Compile Dependencies
       run: |
         cmake --build build --parallel --config ${{ matrix.config }} --target compile-osp-magnum-deps compile-test-deps
+
+    # Currently we have no way to apply the gcc analyzer to only osp-magnum.
+    # TODO: Only run the analyzer against osp-magnum.
+    - name: Run GCC Analyzer
+      if: ${{ matrix.tool == 'gcc-analyzer' }}
+      run: |
+        cmake --build build --parallel || true
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
@@ -121,7 +132,7 @@ jobs:
         wget https://raw.githubusercontent.com/include-what-you-use/include-what-you-use/clang_14/iwyu_tool.py
         chmod +x iwyu_tool.py
         # iwyu_tool.py returns non-zero if any executions returned nonzero. Which... happens to be useless unless the project is already IWYU clean.
-        ./iwyu_tool.py -j $(nproc) -p build -- -Xiwyu --mapping_file=${GITHUB_WORKSPACE}/iwyu-ubuntu.imp || exit 0
+        ./iwyu_tool.py -j $(nproc) -p build -- -Xiwyu --mapping_file=${GITHUB_WORKSPACE}/iwyu-ubuntu.imp || true
 
   analyze-windows:
     runs-on: windows-latest
