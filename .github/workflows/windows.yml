@@ -27,7 +27,7 @@ jobs:
       matrix:
         # ClangCL is known to fail against SDL2-2.0.16 because of the use of -idirafter.
         # MinGW fails due to incomprehensible linker errors... LTO maybe?
-        # LLVM-Clang fails due to cmake configuration issues in newton-dynamics.
+        # LLVM-Clang fails due to the cmake files for corrade assuming clang.exe is msvc.
         # compiler: [msvc, clangcl, mingw, clang]
         compiler: [msvc]
         config: [Release, Debug]
@@ -42,7 +42,7 @@ jobs:
         submodules: recursive
 
     # Don't change this to use v1. It doesn't work correctly with the github "major version" auto-magic
-    - uses: hendrikmuhs/ccache-action@v1.2.9
+    - uses: hendrikmuhs/ccache-action@v1.2.10
       with:
         Key: windows-${{ matrix.image }}-${{ matrix.compiler }}-${{ matrix.config }}
 
@@ -52,13 +52,13 @@ jobs:
     - uses: egor-tensin/setup-clang@v1
       if: ${{ matrix.compiler == 'clang' }}
 
-    - uses: ashutoshvarma/setup-ninja@v1
-      if: ${{ matrix.compiler == 'clang' }}
+    - uses: ashutoshvarma/setup-ninja@v1.1
+      if: ${{ matrix.compiler == 'clang' }} || ${{ matrix.compiler == 'msvc' }}
 
     - name: Configure (MSVC)
       if: ${{ matrix.compiler == 'msvc' }}
       run: |
-        cmake -B build -DCMAKE_CONFIGURATION_TYPES=${{ matrix.config }} -DCMAKE_C_COMPILER_LAUNCHER="ccache.exe" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache.exe"
+        cmake -B build -DCMAKE_CONFIGURATION_TYPES=${{ matrix.config }} -DCMAKE_C_COMPILER_LAUNCHER="ccache.exe" -DCMAKE_CXX_COMPILER_LAUNCHER="ccache.exe" -GNinja
 
     - name: Configure (ClangCL)
       if: ${{ matrix.compiler == 'clangcl' }}
