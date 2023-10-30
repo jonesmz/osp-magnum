@@ -25,11 +25,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # ClangCL is known to fail against SDL2-2.0.16 because of the use of -idirafter.
         # MinGW fails due to incomprehensible linker errors... LTO maybe?
+        # Clang CL fails due to https://github.com/libsdl-org/SDL/issues/6214 
         # LLVM-Clang fails due to cmake configuration issues in newton-dynamics.
         # compiler: [msvc, clangcl, mingw, clang]
-        compiler: [msvc]
+        compiler: [msvc,clangcl]
         config: [Release, Debug]
         image: [windows-2019, windows-2022]
 
