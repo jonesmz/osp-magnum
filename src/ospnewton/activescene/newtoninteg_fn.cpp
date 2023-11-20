@@ -27,7 +27,7 @@
 
 #include <osp/activescene/basic_fn.h>
 
-#include <Newton.h>                  // for NewtonBodySetCollision
+#include <ndNewton.h>                // for NewtonBodySetCollision
 
 #include <utility>                   // for std::exchange
 #include <cassert>                   // for assert

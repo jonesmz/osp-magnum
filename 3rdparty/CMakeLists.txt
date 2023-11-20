@@ -29,6 +29,10 @@ SET(BUILD_DEPRECATED OFF CACHE BOOL "" FORCE)
 SET(BUILD_GMOCK      OFF CACHE BOOL "" FORCE)
 SET(BUILD_STATIC     ON  CACHE BOOL "" FORCE) # Applies to more than one third party...
 
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+ADD_SUBDIRECTORY(googletest EXCLUDE_FROM_ALL)
+
 if(NOT OSP_USE_SYSTEM_SDL)
   # This is the most minimal set of features which still make Sdl2Application
   # work. If you need something from these, remove the setting. The SDL_AUDIO
@@ -187,19 +191,60 @@ SET(MAGNUM_WITH_TINYGLTFIMPORTER ON CACHE BOOL "" FORCE)
 SET(MAGNUM_WITH_STBIMAGEIMPORTER ON CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(magnum-plugins EXCLUDE_FROM_ALL)
 
-SET(NEWTON_BUILD_SANDBOX_DEMOS       OFF CACHE BOOL "" FORCE)
-SET(NEWTON_BUILD_SHARED_LIBS         ON  CACHE BOOL "" FORCE)
-SET(NEWTON_USE_PLUGIN_DLL            OFF CACHE BOOL "" FORCE)
-SET(NEWTON_WITH_AVX_PLUGIN           OFF CACHE BOOL "" FORCE)
-SET(NEWTON_WITH_REFERENCE_GPU_PLUGIN OFF CACHE BOOL "" FORCE)
-ADD_SUBDIRECTORY(newton-dynamics/newton-3.14/ EXCLUDE_FROM_ALL)
+##
+# Newton dynamics
+##
+
+SET(NEWTON_EXCLUDE_TEST               ON  CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_SANDBOX_DEMOS        OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_PROFILER             OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_SINGLE_THREADED      OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_SHARED_LIBS          OFF CACHE BOOL "" FORCE)
+
+SET(NEWTON_ENABLE_AVX2_SOLVER         OFF CACHE BOOL "" FORCE)
+SET(NEWTON_ENABLE_CUDA_SOLVER         OFF CACHE BOOL "" FORCE)
+SET(NEWTON_ENABLE_OPENCL_SOLVER       OFF CACHE BOOL "" FORCE)
+SET(NEWTON_DOUBLE_PRECISION           OFF CACHE BOOL "" FORCE)
+SET(NEWTON_NO_SIMD_INTRINSICS         OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_NEWTON_JAVA          OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_NEWTON_PYTHON        OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_NEWTON_C_SHARP       OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_NEWTON_BLENDER       OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_ANDROID_STUDIO       OFF CACHE BOOL "" FORCE)
+SET(NEWTON_STATIC_RUNTIME_LIBRARIES   OFF CACHE BOOL "" FORCE)
+SET(NEWTON_BUILD_CREATE_SUB_PROJECTS  OFF CACHE BOOL "" FORCE)
+SET(NEWTON_USE_DEFAULT_NEW_AND_DELETE OFF CACHE BOOL "" FORCE)
+
+ADD_SUBDIRECTORY(newton-dynamics/newton-4.00/ EXCLUDE_FROM_ALL)
+
+
+# Fixup newton-dynamics/newton-4.00's lack of target-centric properties.
+# We don't want to be manually specifying include directory details in
+# osp-magnum/src/CMakeLists.txt, so tag the library with the correct
+# include directories here.
+target_include_directories(ndNewton PUBLIC
+                               newton-dynamics/newton-4.00/sdk/dCore
+                               newton-dynamics/newton-4.00/sdk/dNewton
+                               newton-dynamics/newton-4.00/sdk/dTinyxml
+                               newton-dynamics/newton-4.00/sdk/dCollision
+                               newton-dynamics/newton-4.00/sdk/dNewton/dJoints
+                               newton-dynamics/newton-4.00/sdk/dNewton/dModels
+                               newton-dynamics/newton-4.00/sdk/dNewton/dIkSolver
+                               newton-dynamics/newton-4.00/sdk/dNewton/dParticles
+                               newton-dynamics/newton-4.00/sdk/dNewton/dModels/dVehicle
+                               newton-dynamics/newton-4.00/sdk/dNewton/dModels/dCharacter
+                          )
+
+target_compile_definitions(ndNewton PUBLIC
+                               _D_SINGLE_LIBRARY
+                          )
 
 # Newton sets CMAKE_ARCHIVE_OUTPUT_DIRECTORY and CMAKE_LIBRARY_OUTPUT_DIRECTORY
 # for UNIX, so manually set each target to our desired location
-SET_TARGET_PROPERTIES(dAnimation dContainers dCustomJoints dMath dModel dNewton dScene dVehicle dgCore dgPhysics newton PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
-)
+#SET_TARGET_PROPERTIES(dAnimation dContainers dCustomJoints dMath dModel dNewton dScene dVehicle dgCore dgPhysics newton PROPERTIES
+#    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}"
+#    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+#)
 
 ADD_SUBDIRECTORY(entt EXCLUDE_FROM_ALL)
 
@@ -211,10 +256,6 @@ SET(SPDLOG_ENABLE_PCH ON CACHE BOOL "" FORCE)
 # SET(SPDLOG_USE_STD_FORMAT ON CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(spdlog EXCLUDE_FROM_ALL)
 ADD_SUBDIRECTORY(longeronpp EXCLUDE_FROM_ALL)
-
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-SET(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-ADD_SUBDIRECTORY(googletest EXCLUDE_FROM_ALL)
 
 SET(FT_DISABLE_ZLIB        ON CACHE BOOL "" FORCE)
 SET(FT_DISABLE_BZIP2       ON CACHE BOOL "" FORCE)

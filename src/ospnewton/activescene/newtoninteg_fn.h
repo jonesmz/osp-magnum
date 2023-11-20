@@ -31,7 +31,7 @@
 
 #include <Corrade/Containers/ArrayView.h>
 
-#include <Newton.h>
+#include <ndNewton.h>
 
 // IWYU pragma: no_include <cstdint>
 // IWYU pragma: no_include <stdint.h>

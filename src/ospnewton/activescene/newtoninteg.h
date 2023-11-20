@@ -30,7 +30,7 @@
 #include <osp/core/id_map.h>
 #include <osp/core/bitvector.h>
 
-#include <Newton.h>
+#include <ndNewton.h>
 
 #include <longeron/id_management/registry_stl.hpp>
 
