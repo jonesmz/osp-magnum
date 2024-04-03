@@ -153,7 +153,7 @@ if(NOT OSP_USE_SYSTEM_SDL)
   # Work around macos-13 erroring on -Werror,-Wdeclaration-after-statement
   check_c_compiler_flag	(-Wno-error=declaration-after-statement HAVE_GCC_WNO_ERROR_DECLARATION_AFTER_STATEMENT)
   if(HAVE_GCC_WNO_ERROR_DECLARATION_AFTER_STATEMENT)
-    target_compile_options(sdl-build-options INTERFACE "-Wno-error=declaration-after-statement")
+  #  target_compile_options(sdl-build-options INTERFACE "-Wno-error=declaration-after-statement")
   endif()
 
 endif() # NOT OSP_USE_SYSTEM_SDL
