@@ -219,10 +219,11 @@ SET(CMAKE_CXX_STANDARD 20)
 SET(toml11_INSTALL OFF CACHE BOOL "" FORCE)
 ADD_SUBDIRECTORY(toml11 EXCLUDE_FROM_ALL)
 
-SET(SPDLOG_ENABLE_PCH ON CACHE BOOL "" FORCE)
-# Not yet supported by github runners
-# SET(SPDLOG_USE_STD_FORMAT ON CACHE BOOL "" FORCE)
+SET(SPDLOG_ENABLE_PCH ON CACHE BOOL "" FORCE) # Build with a PCH to get a minor build speedup
+SET(SPDLOG_USE_STD_FORMAT ON CACHE BOOL "" FORCE) # Don't use the bundled {fmt} use std::format
+SET(SPDLOG_SYSTEM_INCLUDES ON CACHE BOOL "" FORCE) # Expose the headers as system includes to avoid warnings
 ADD_SUBDIRECTORY(spdlog EXCLUDE_FROM_ALL)
+
 ADD_SUBDIRECTORY(longeronpp EXCLUDE_FROM_ALL)
 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
